@@ -1,65 +1,127 @@
-import Image from "next/image";
+"use client";
+
+import MenuOverlay from "@/Components/MenuOverlay";
+import Header from "@/Sections/Header";
+import { preloadAssets } from "@/Utils/preloadAssets";
+import { useEffect, useRef, useState } from "react";
+import Data from "@/Utils/info";
+import { useOverlayContext } from "@/Utils/OverlayContext";
+import Loading from "@/Components/Loading";
+import Mouse from "@/Utils/Mouse";
+import { useTouchDevice } from "@/Utils/DeviceDetector";
+import { useGSAP } from "@gsap/react";
+import SocialMedia from "@/Components/SocialMedia";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Landing from "@/Sections/Landing";
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+	const [isDark, setIsDark] = useState(false);
+	const [mounted, setMounted] = useState(false);
+	const [loaded, setLoaded] = useState(false);
+	const [percentage, setPercentage] = useState(0);
+	const menuOverlayRef = useRef(null);
+	const { viewModal, setViewModal } = useOverlayContext();
+	const [shouldRenderOverlay, setShouldRenderOverlay] = useState(false);
+	const sociallinks = Data[4].sociallinks;
+	const touchDevice = useTouchDevice();
+
+	/**
+	 * Local Storage Check
+	 */
+	useEffect(() => {
+		const previouslyLoaded = localStorage.getItem("@mhdAshraful");
+		if (previouslyLoaded) {
+			setLoaded(true);
+		} else {
+			preloadAssets(setPercentage)
+				.then(() => {
+					setLoaded(true);
+				})
+				.catch((err) => {
+					console.error("Error preloading assets:", err);
+					setLoaded(true); // fallback to try to showing app anyway
+				});
+		}
+	}, []);
+
+	useEffect(() => {
+		// Load theme from localStorage
+		const savedTheme = localStorage.getItem("theme");
+		const prefersDark = window.matchMedia(
+			"(prefers-color-scheme: dark)",
+		).matches;
+		const shouldBeDark =
+			savedTheme === "dark" || (!savedTheme && prefersDark);
+
+		if (shouldBeDark) {
+			document.documentElement.classList.add("dark");
+			setIsDark(true);
+		} else {
+			document.documentElement.classList.remove("dark");
+			setIsDark(false);
+		}
+		setMounted(true);
+	}, []);
+
+	function toggleTheme() {
+		const html = document.documentElement;
+
+		if (isDark) {
+			html.classList.remove("dark");
+			localStorage.setItem("theme", "light");
+			setIsDark(false);
+		} else {
+			html.classList.add("dark");
+			localStorage.setItem("theme", "dark");
+			setIsDark(true);
+		}
+	}
+
+	useEffect(() => {
+		if (viewModal) {
+			setShouldRenderOverlay(true);
+		}
+	}, [viewModal]);
+
+	if (!mounted) return null;
+
+	return !loaded ? (
+		<Loading percent={percentage} />
+	) : (
+		<div className="flex min-h-screen items-center justify-center bg-white font-sans dark:bg-black">
+			<Header />
+
+			{/* Mouse on non touch device */}
+			{/* {!touchDevice && <Mouse />} */}
+
+			{/* Menu Overlay, Extra check is necessary to make sure the animate out complets */}
+			{shouldRenderOverlay && (
+				/* Only mount when needed */
+				<MenuOverlay
+					ref={menuOverlayRef}
+					linkedin={sociallinks.linkedin}
+					twitter={sociallinks.twitter}
+					github={sociallinks.github}
+				/>
+			)}
+
+			<SocialMedia
+				twitter={sociallinks.twitter}
+				linkedin={sociallinks.linkedin}
+				github={sociallinks.github}
+			/>
+
+			{/* Main Sections */}
+			<Landing />
+
+			{/* <button
+				onClick={toggleTheme}
+				className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded"
+			>
+				{isDark ? "Light Mode" : "Dark Mode"}
+			</button> */}
+
+			{/* <Logo /> */}
+		</div>
+	);
 }

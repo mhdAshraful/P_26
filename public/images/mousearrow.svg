@@ -1,0 +1,8 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 42">
+<rect width="40" height="40" fill="white"/>
+<path id="Ellipse 17" d="M20 17.5C21.3807 17.5 22.5 18.6193 22.5 20C22.5 21.3807 21.3807 22.5 20 22.5C18.6193 22.5 17.5 21.3807 17.5 20C17.5 18.6193 18.6193 17.5 20 17.5Z" fill="#0F0F0F" stroke="#0F0F0F"/>
+<path id="arrowUpDown" d="M23.5 25.5L20.24 29M20.24 11L17 15M20.24 11L23.5 15M20.24 11V17.5M17 25.5L20.24 29M20.24 29V22.5" stroke="#ED3203" stroke-linecap="round"/>
+<path id="Vector" d="M10 31.5L29.4998 9M29.4998 9H15.1147M29.4998 9V23.5" stroke="#ED3203" stroke-linecap="round"/>
+</g>
+</svg>

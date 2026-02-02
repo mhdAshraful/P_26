@@ -1,26 +1,90 @@
+/* stylelint-disable at-rule-no-unknown */
+/* postcss-bem-linter: ignore */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--greener: #9dff0a;
+	--red: #ed3203;
+	--red40: #ed320373;
+	--black: #0f0f0f;
+	--black40: #0f0f0f4b;
+	--cream: #fafad2;
+	--cream40: #fafad2b7;
+	--white: #fffff2;
+	--white40: #fffff2a7;
+	--bg: #fffff2;
+	--fg: #0f0f0f;
+	--fira: "Fira Sans", sans-serif;
+	--neueVar: "Neue Regrade Variable", sans-serif;
+	--grotesk: "Space Grotesk Variable", sans-serif;
+	--width: 100vw;
+	--height: 100dvh;
+	--gutter: 40px;
+	--borderradious: 16px;
+	--text-title: clamp(
+		33px,
+		calc(33px + (96 - 33) * ((100vw - 320px) / (1920 - 320))),
+		96px
+	);
+	--text-menu: clamp(
+		50px,
+		calc(50px + (150 - 50) * ((100vw - 768px) / (1920 - 768))),
+		150px
+	);
+	--text-secondary: clamp(
+		12px,
+		calc(12px + (18 - 12) * ((100vw - 768px) / (1920 - 768))),
+		18px
+	);
+}
+
+.dark {
+	--bg: #0f0f0f;
+	--fg: #fffff2;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-greener: var(--greener);
+	--color-red: var(--red);
+	--color-red40: var(--red40);
+	--color-black: var(--black);
+	--color-black40: var(--black40);
+	--color-cream: var(--cream);
+	--color-cream40: var(--cream40);
+	--color-white: var(--white);
+	--color-white40: var(--white40);
+	--font-fira: var(--fira);
+	--font-neueVar: var(--neueVar);
+	--font-grotesk: var(--grotesk);
+	--text-title: var(--text-title);
+	--text-menu: var(--text-menu);
+	--text-secondary: var(--text-secondary);
+	--spacing-gutter: var(--gutter);
+	--border-radius-borderradious: var(--borderradious);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@media (max-width: 1024px) {
+	:root {
+		--gutter: 32px;
+		--borderradious: 12px;
+		--border: 1px solid var(--black);
+	}
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (max-width: 768px) {
+	:root {
+		--gutter: 20px;
+		--borderradious: 10px;
+		--border: 1px solid var(--black);
+	}
+}
+
+@media (max-width: 480px) {
+	:root {
+		--gutter: 8px;
+		--borderradious: 4px;
+		--border: none;
+	}
 }
