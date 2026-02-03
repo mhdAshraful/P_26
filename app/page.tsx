@@ -3,7 +3,7 @@
 import MenuOverlay from "@/Components/MenuOverlay";
 import Header from "@/Sections/Header";
 import { preloadAssets } from "@/Utils/preloadAssets";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Data from "@/Utils/info";
 import { useOverlayContext } from "@/Utils/OverlayContext";
 import Loading from "@/Components/Loading";
@@ -12,9 +12,13 @@ import { useTouchDevice } from "@/Utils/DeviceDetector";
 import { useGSAP } from "@gsap/react";
 import SocialMedia from "@/Components/SocialMedia";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Landing from "@/Sections/Landing";
+import dynamic from "next/dynamic";
+
+const Landing = dynamic(() => import("@/Sections/Landing"));
 
 export default function Home() {
+	const [width, setWidth] = useState<number | undefined>();
+	const [height, setHeight] = useState<number | undefined>();
 	const [isDark, setIsDark] = useState(false);
 	const [mounted, setMounted] = useState(false);
 	const [loaded, setLoaded] = useState(false);
@@ -24,6 +28,8 @@ export default function Home() {
 	const [shouldRenderOverlay, setShouldRenderOverlay] = useState(false);
 	const sociallinks = Data[4].sociallinks;
 	const touchDevice = useTouchDevice();
+
+	const landingRef = useRef<React.ReactNode>(null);
 
 	/**
 	 * Local Storage Check
@@ -43,6 +49,17 @@ export default function Home() {
 				});
 		}
 	}, []);
+
+	useEffect(() => {
+		if (!loaded) return;
+		if (ScrollTrigger.isTouch) {
+			document.body.classList.add("touch");
+			ScrollTrigger.refresh();
+		} else {
+			document.body.classList.remove("touch");
+			ScrollTrigger.refresh();
+		}
+	}, [loaded]);
 
 	useEffect(() => {
 		// Load theme from localStorage
@@ -83,7 +100,24 @@ export default function Home() {
 		}
 	}, [viewModal]);
 
-	if (!mounted) return null;
+	/***
+	 * Continue previous
+	 * */
+	useLayoutEffect(() => {
+		const handleResize = () => {
+			setWidth(
+				typeof window !== "undefined" ? window.innerWidth : undefined,
+			);
+			setHeight(
+				typeof window !== "undefined" ? window.innerHeight : undefined,
+			);
+			ScrollTrigger.refresh();
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
 
 	return !loaded ? (
 		<Loading percent={percentage} />
@@ -112,7 +146,9 @@ export default function Home() {
 			/>
 
 			{/* Main Sections */}
-			<Landing />
+			<Suspense fallback={null}>
+				<Landing ref={landingRef} />
+			</Suspense>
 
 			{/* <button
 				onClick={toggleTheme}

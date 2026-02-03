@@ -137,9 +137,9 @@ const MenuOverlay = forwardRef<HTMLDivElement, MenuOverlayProps>(
 		}, [viewModal, initialPath, curvDown]);
 
 		return (
-			<div ref={ref}>
+			<div ref={ref} className="absolute  z-1000">
 				<div
-					className={`relative w-screen h-[var(--height)] z-400 bg-red flex flex-col justify-center -translate-y-[calc(100%+400px)] invisible [scroll-behavior:unset]`}
+					className={`w-screen h-screen  z-1000 bg-red flex flex-col justify-center -translate-y-[calc(100%+400px)] invisible [scroll-behavior:unset]`}
 					ref={menuRef}
 				>
 					<div className="w-[calc(100vw-(var(--gutter)*2))] h-[calc(100%-(var(--gutter)*2))] flex flex-row-reverse justify-start items-end gap-[10rem] max-md:flex-col max-md:justify-start max-md:items-end max-md:gap-[4rem] max-md:h-auto">
